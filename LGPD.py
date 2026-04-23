@@ -79,9 +79,12 @@ def censor_phone(user) -> str:
     phone: list[str] = user.telefone
     return phone[-4:]
 
-def save_to_csv(data_dict: dict, filepath: Path):
-    with open(filepath, 'w', newline='') as file:
-        fieldnames: list[str] = data_dict.keys()
+def save_to_csv(data: list[dict], filepath: Path):
+    if not data:
+        return
+
+    with open(filepath, 'w', newline='', encoding='utf-8-sig') as file:
+        fieldnames: list[str] = data[0].keys()
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         
         writer.writeheader()
@@ -96,3 +99,9 @@ with engine.connect() as conn:
 
 for user in users:
     print(user)
+
+def users_by_yob(users: list, year: int) -> list:
+    return [u for u in users if u["data_nascimento"].year == year]
+
+year: int = 2006
+save_to_csv(users_by_yob(users, year), f"{year}.csv")
