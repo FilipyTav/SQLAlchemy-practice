@@ -7,7 +7,6 @@ from sqlalchemy import (
     String,
     Date,
     DateTime,
-    insert,
     text,
 )
 from datetime import datetime
@@ -15,7 +14,7 @@ from env import DB_NAME, DB_PWD, DB_HOST, DB_USER
 import csv
 from pathlib import Path
 import logging
-from config import LOG_PATH, DATA_DIR, ALL_USERS_CSV, DATA_YEARS_DIR
+from config import LOG_PATH, ALL_USERS_CSV, DATA_YEARS_DIR
 
 import time
 from functools import wraps
@@ -131,32 +130,29 @@ def save_to_csv(data: list[dict], filepath: Path, fieldnames: list[str] = []) ->
     print(f"Dados salvos em {filepath}")
 
 
-users_uncensored: list = []
-users: list = []
-with engine.connect() as conn:
-    result = conn.execute(text("SELECT * FROM usuarios LIMIT 25;"))
-    for row in result:
-        users_uncensored.append(row)
-
-        row = LGPD(row)
-        users.append(row)
-
-# for user in users:
-#     print(user["data_nascimento"].year)
-
-
-# ATV.2
 def users_by_yob(users: list, year: int) -> list:
     return [u for u in users if u["data_nascimento"].year == year]
 
 
-years: list[int] = [1982, 2004, 2006]
-for year in years:
-    save_to_csv(users_by_yob(users, year), DATA_YEARS_DIR / f"{year}.csv")
-
-# ATV. 3
-all: list[dict] = [{"Nome": u.nome, "CPF": u.cpf} for u in users_uncensored]
-save_to_csv(all, ALL_USERS_CSV)
-
 if __name__ == "__main__":
-    pass
+    users_uncensored: list = []
+    users_censored: list = []
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM usuarios LIMIT 25;"))
+        for row in result:
+            users_uncensored.append(row)
+
+            row = LGPD(row)
+            users_censored.append(row)
+
+    # for user in users_censored:
+    #     print(user)
+
+    # ATV.2
+    years: list[int] = [1982, 2004, 2006]
+    for year in years:
+        save_to_csv(users_by_yob(users_censored, year), DATA_YEARS_DIR / f"{year}.csv")
+
+    # ATV. 3
+    all: list[dict] = [{"Nome": u.nome, "CPF": u.cpf} for u in users_uncensored]
+    save_to_csv(all, ALL_USERS_CSV)
