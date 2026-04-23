@@ -6,7 +6,13 @@ Projeto para acessar uma base de dados e aplicar a LGPD em dados de usuários, c
 
 | Diretório / Arquivo | Descrição |
 | :--- | :--- |
-| | Ponto de entrada da aplicação. |
+| **src/** | **Arquivos de código** |
+| `LGPD.py` | Ponto de entrada da aplicação. |
+| `config.py` | Configuração de variáveis e funções globais. |
+| **src/data/** | **Dados gerados pelo código, a partir da base de dados** |
+| ├─ `todos.csv` | Dados sobre todos usuários da DB. |
+| ├─ `lgpd.log` | Log da execução de `LGPD.py`. |
+| └─ `years/` | Dados em `CSV` de usuários nascidos em um ano em particular. |
 
 ## Como Executar
 
@@ -53,5 +59,5 @@ DB_USER = ...
 ### 3. Execução
 Execute o arquivo principal:
 ```bash
-python src/main.py
+python src/LGPD.py
 ```
