@@ -48,7 +48,10 @@ def censor_cpf(user):
     return f"{cpf[0]}.***.***-**"
 
 def censor_email(user):
-    pass
+    email: list[str] = user.email.split("@")
+    newem: str = email[0]
+    newem: str = newem[0] + "*" * (len(newem) - 1)
+    return f"{newem}@{email[1]}"
 
 def censor_phone(user):
     pass
