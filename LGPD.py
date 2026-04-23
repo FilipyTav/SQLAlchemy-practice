@@ -39,6 +39,7 @@ metadata.create_all(engine)
 def LGPD(row):
     return censor_user(row)
 
+# ATV. 1
 def censor_user(user):
     # Cause user is immutable
     # return (
@@ -79,29 +80,37 @@ def censor_phone(user) -> str:
     phone: list[str] = user.telefone
     return phone[-4:]
 
-def save_to_csv(data: list[dict], filepath: Path):
+def save_to_csv(data: list[dict], filepath: Path, fieldnames: list[str] = []) -> None:
     if not data:
         return
 
     with open(filepath, 'w', newline='', encoding='utf-8-sig') as file:
-        fieldnames: list[str] = data[0].keys()
+        fieldnames: list[str] = fieldnames if fieldnames else data[0].keys()
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         
         writer.writeheader()
         writer.writerows(data)
 
-users = []
+users_uncensored: list = []
+users: list = []
 with engine.connect() as conn:
     result = conn.execute(text("SELECT * FROM usuarios LIMIT 5;"))
     for row in result:
+        users_uncensored.append(row)
+
         row = LGPD(row)
         users.append(row)
 
-for user in users:
-    print(user)
+# for user in users:
+#     print(user)
 
+# ATV.2
 def users_by_yob(users: list, year: int) -> list:
     return [u for u in users if u["data_nascimento"].year == year]
 
 year: int = 2006
 save_to_csv(users_by_yob(users, year), f"{year}.csv")
+
+# ATV. 3
+all: list[dict] = [{"Nome": u.nome, "CPF": u.cpf} for u in users_uncensored]
+save_to_csv(all, "todos.csv")
