@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, DateTime, insert, text
 from datetime import datetime
 from env import DB_NAME, DB_PWD, DB_HOST, DB_USER
+import csv
+from pathlib import Path
 
 import time
 from functools import wraps
@@ -76,6 +78,14 @@ def censor_phone(user) -> str:
             return "****"
     phone: list[str] = user.telefone
     return phone[-4:]
+
+def save_to_csv(data_dict: dict, filepath: Path):
+    with open(filepath, 'w', newline='') as file:
+        fieldnames: list[str] = data_dict.keys()
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        
+        writer.writeheader()
+        writer.writerows(data)
 
 users = []
 with engine.connect() as conn:
