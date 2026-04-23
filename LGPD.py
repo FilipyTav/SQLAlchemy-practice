@@ -3,9 +3,20 @@ from datetime import datetime
 from env import DB_NAME, DB_PWD, DB_HOST, DB_USER
 import csv
 from pathlib import Path
+import logging
+from config import LOG_PATH, DATA_DIR, ALL_USERS_CSV, DATA_YEARS_DIR
 
 import time
 from functools import wraps
+
+logging.basicConfig(
+    filename=LOG_PATH, 
+    filemode='w',
+    encoding='utf-8',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
 def medir_tempo(func):
     """Decorator que mede o tempo de execução de uma função."""
     @wraps(func)
@@ -14,7 +25,7 @@ def medir_tempo(func):
         resultado = func(*args, **kwargs)
         fim = time.perf_counter()     # tempo final
         duracao = fim - inicio
-        print(f"⏱ Função '{func.__name__}' executada em {duracao:.6f} segundos.")
+        logging.info(f"⏱ Função '{func.__name__}' executada em {duracao:.6f} segundos.")
         return resultado
     return wrapper
 
@@ -80,6 +91,7 @@ def censor_phone(user) -> str:
     phone: list[str] = user.telefone
     return phone[-4:]
 
+@medir_tempo
 def save_to_csv(data: list[dict], filepath: Path, fieldnames: list[str] = []) -> None:
     if not data:
         return
@@ -109,8 +121,8 @@ def users_by_yob(users: list, year: int) -> list:
     return [u for u in users if u["data_nascimento"].year == year]
 
 year: int = 2006
-save_to_csv(users_by_yob(users, year), f"{year}.csv")
+save_to_csv(users_by_yob(users, year), DATA_YEARS_DIR / f"{year}.csv")
 
 # ATV. 3
 all: list[dict] = [{"Nome": u.nome, "CPF": u.cpf} for u in users_uncensored]
-save_to_csv(all, "todos.csv")
+save_to_csv(all, ALL_USERS_CSV)
