@@ -113,8 +113,8 @@ with engine.connect() as conn:
         row = LGPD(row)
         users.append(row)
 
-# for user in users:
-#     print(user)
+for user in users:
+    print(user)
 
 # ATV.2
 def users_by_yob(users: list, year: int) -> list:
