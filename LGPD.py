@@ -37,6 +37,21 @@ metadata.create_all(engine)
 def LGPD(row):
     return row
 
+def censor_name(user) -> str :
+    name: list[str] = user.nome.split(" ")
+    newn: str = name[0]
+    newn: str = newn[0] + "*" * (len(newn) - 1)
+    return newn
+
+def censor_cpf(user):
+    pass
+
+def censor_email(user):
+    pass
+
+def censor_phone(user):
+    pass
+
 users = []
 with engine.connect() as conn:
     result = conn.execute(text("SELECT * FROM usuarios LIMIT 5;"))
