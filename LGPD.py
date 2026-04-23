@@ -44,7 +44,8 @@ def censor_name(user) -> str :
     return newn
 
 def censor_cpf(user):
-    pass
+    cpf: list[str] = user.cpf.split(".")
+    return f"{cpf[0]}.***.***-**"
 
 def censor_email(user):
     pass
