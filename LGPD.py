@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, DateTime, insert, text
 from datetime import datetime
+from env import DB_NAME, DB_PWD, DB_HOST, DB_USER
 
 import time
 from functools import wraps
@@ -15,7 +16,7 @@ def medir_tempo(func):
         return resultado
     return wrapper
 
-engine = create_engine("postgresql+psycopg2://alunos:AlunoFatec@200.19.224.150:5432/atividade2", echo=False)
+engine = create_engine(f"postgresql+psycopg2://{DB_USER}:{DB_PWD}@{DB_HOST}:5432/{DB_NAME}", echo=False)
 metadata = MetaData()
 
 usuarios = Table(
