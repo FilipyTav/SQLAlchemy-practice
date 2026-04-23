@@ -35,7 +35,25 @@ metadata.create_all(engine)
 
 @medir_tempo
 def LGPD(row):
-    return row
+    return censor_user(row)
+
+def censor_user(user):
+    # Cause user is immutable
+    # return (
+    #     user.id, censor_name(user), censor_cpf(user), censor_email(user),
+    #     censor_phone(user), user.data_nascimento, user.created_on
+    # )
+
+    return {
+        "id": user.id,
+        "nome": censor_name(user),
+        "cpf": censor_cpf(user),
+        "email": censor_email(user),
+        "telefone": censor_phone(user),
+        "data_nascimento": user.data_nascimento,
+        "created_on": user.created_on,
+        "updated_on": user.updated_on,
+    }
 
 def censor_name(user) -> str :
     name: list[str] = user.nome.split(" ")
@@ -54,6 +72,8 @@ def censor_email(user) -> str:
     return f"{newem}@{email[1]}"
 
 def censor_phone(user) -> str:
+    if not user.telefone:
+            return "****"
     phone: list[str] = user.telefone
     return phone[-4:]
 
